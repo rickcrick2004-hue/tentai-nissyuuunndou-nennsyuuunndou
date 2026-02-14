@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroMaster - 星の動き完全攻略 ver 2.1.4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            touch-action: manipulation;
+        }
+        canvas {
+            background: linear-gradient(to bottom, #0f172a 0%, #1e293b 70%, #0f172a 100%);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+        }
+        .tab-btn.active {
+            background-color: #3b82f6;
+            color: white;
+            border-bottom: 4px solid #1d4ed8;
+        }
+        .tab-btn {
+            transition: all 0.2s;
+        }
+        
+        .slider-container {
+            position: relative;
+            padding-bottom: 24px;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            position: relative;
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            margin-top: -11px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            border: 2px solid white;
+            position: relative;
+            z-index: 20;
+        }
+        
+        input[type=range]:focus::-webkit-slider-thumb {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        .slider-scale {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            width: 100%;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+        
+        .scale-point {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 1px;
+            position: relative;
+        }
+
+        .scale-dot {
+            width: 4px;
+            height: 4px;
+            background-color: #94a3b8;
+            border-radius: 50%;
+            margin-bottom: 4px;
+        }
+        
+        .scale-line {
+            width: 2px;
+            height: 6px;
+            background-color: #cbd5e1;
+            margin-bottom: 4px;
+        }
+
+        .scale-label {
+            font-size: 10px;
+            color: #64748b;
+            white-space: nowrap;
+            position: absolute;
+            top: 12px;
+            transform: translateX(-50%);
+        }
+
+        .sky-switch {
+            display: inline-flex;
+            background: #1e293b;
+            padding: 4px;
+            border-radius: 9999px;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .sky-switch button {
+            position: relative;
+            z-index: 10;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+        .sky-switch .selector {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            background: #3b82f6;
+            border-radius: 9999px;
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .sky-switch.north .selector {
+            transform: translateX(100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white p-4 shadow-lg sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <h1 class="text-xl md:text-2xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-star text-yellow-400"></i>
+                AstroMaster <span class="text-xs font-normal text-slate-400 ml-2">ver 2.1.4</span>
+            </h1>
+            
+            <div class="flex items-center gap-4">
+                <div class="sky-switch" id="skySwitchContainer">
+                    <div class="selector"></div>
+                    <button onclick="setDirection('south')" class="text-white" id="btn-south">南の空</button>
+                    <button onclick="setDirection('north')" class="text-slate-400" id="btn-north">北の空</button>
+                </div>
+
+                <button onclick="resetAll()" class="bg-red-600 hover:bg-red-700 text-white text-xs md:text-sm font-bold py-2 px-4 rounded-full shadow transition flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-left"></i> リセット
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto p-4 max-w-4xl flex flex-col gap-6">
+
+        <!-- Visualizer Area -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
+            <div class="relative w-full aspect-[4/3] md:aspect-[16/9]">
+                <canvas id="skyCanvas" class="w-full h-full block"></canvas>
+                
+                <div class="absolute top-4 left-4 bg-slate-900/80 text-white p-3 rounded-lg backdrop-blur-sm border border-slate-700 text-sm md:text-base pointer-events-none">
+                    <div class="flex items-center gap-2 mb-1">
+                        <i class="fa-regular fa-calendar text-blue-300"></i>
+                        <span id="displayDate">1月10日</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-regular fa-clock text-yellow-300"></i>
+                        <span id="displayTime">0:00</span>
+                    </div>
+                </div>
+
+                <div class="absolute top-4 right-4 bg-slate-900/80 text-white p-3 rounded-lg backdrop-blur-sm border border-slate-700 text-right pointer-events-none">
+                    <div class="text-xs text-slate-400 mb-1" id="starLabel">星Aの位置</div>
+                    <div class="font-bold text-lg md:text-xl text-yellow-400" id="positionInfo">南中</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls Area -->
+        <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+            <!-- Tabs -->
+            <div class="flex border-b border-slate-200 bg-slate-50">
+                <button onclick="switchMode('diurnal')" id="tab-diurnal" class="tab-btn flex-1 py-4 text-center font-bold text-slate-600 hover:bg-slate-100 flex flex-col items-center gap-1 active">
+                    <i class="fa-solid fa-rotate-right"></i> 日周運動
+                </button>
+                <button onclick="switchMode('annual')" id="tab-annual" class="tab-btn flex-1 py-4 text-center font-bold text-slate-600 hover:bg-slate-100 flex flex-col items-center gap-1">
+                    <i class="fa-solid fa-calendar-days"></i> 年周運動
+                </button>
+                <button onclick="switchMode('combined')" id="tab-combined" class="tab-btn flex-1 py-4 text-center font-bold text-slate-600 hover:bg-slate-100 flex flex-col items-center gap-1">
+                    <i class="fa-solid fa-graduation-cap"></i> 応用・攻略
+                </button>
+            </div>
+
+            <!-- Panel: Diurnal -->
+            <div id="panel-diurnal" class="p-6 control-panel">
+                <div class="mb-4 bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <h3 class="font-bold text-blue-800 mb-2"><i class="fa-solid fa-circle-info"></i> ルール</h3>
+                    <p class="text-sm text-blue-700">地球が自転するため、星は1時間に<span class="font-bold text-red-500">15°</span>ずつ<span class="font-bold">東から西へ</span>動きます。</p>
+                </div>
+                
+                <div class="flex flex-col gap-8">
+                    <div class="slider-container">
+                        <div class="flex justify-between mb-2 items-end">
+                            <span class="font-bold text-lg text-blue-600"><i class="fa-regular fa-clock"></i> 時間の変化</span>
+                            <span class="font-bold text-xl text-slate-800 bg-blue-100 px-3 py-1 rounded" id="diurnal-val">0時間後 (0:00)</span>
+                        </div>
+                        
+                        <input type="range" id="diurnal-slider" min="-6" max="6" value="0" step="1">
+                        <div id="scale-diurnal" class="slider-scale px-2"></div>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-4">
+                        <button onclick="adjustDiurnal(-1)" class="bg-white border-2 border-slate-200 hover:border-slate-400 hover:bg-slate-50 py-3 rounded-lg font-bold text-slate-600 transition shadow-sm">
+                            <i class="fa-solid fa-backward"></i> 1時間戻す
+                        </button>
+                        <div class="flex items-center justify-center text-xs text-slate-400">
+                            リセットは上のボタン
+                        </div>
+                        <button onclick="adjustDiurnal(1)" class="bg-white border-2 border-slate-200 hover:border-slate-400 hover:bg-slate-50 py-3 rounded-lg font-bold text-slate-600 transition shadow-sm">
+                            1時間進める <i class="fa-solid fa-forward"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel: Annual -->
+            <div id="panel-annual" class="p-6 control-panel hidden">
+                <div class="mb-4 bg-green-50 p-4 rounded-lg border border-green-100">
+                    <h3 class="font-bold text-green-800 mb-2"><i class="fa-solid fa-circle-info"></i> ルール</h3>
+                    <p class="text-sm text-green-700">地球が公転するため、星は1ヶ月に<span class="font-bold text-red-500">30°</span>ずつ<span class="font-bold">東から西へ</span>動きます。</p>
+                </div>
+
+                <div class="flex flex-col gap-8">
+                    <div class="slider-container">
+                        <div class="flex justify-between mb-2 items-end">
+                            <span class="font-bold text-lg text-green-600"><i class="fa-regular fa-calendar"></i> 月の変化</span>
+                            <span class="font-bold text-xl text-slate-800 bg-green-100 px-3 py-1 rounded" id="annual-val">1月10日 (基準)</span>
+                        </div>
+                        
+                        <input type="range" id="annual-slider" min="0" max="11" value="0" step="1">
+                        <div id="scale-annual" class="slider-scale px-2"></div>
+                    </div>
+
+                     <div class="grid grid-cols-3 gap-4">
+                        <button onclick="adjustAnnual(-1)" class="bg-white border-2 border-slate-200 hover:border-slate-400 hover:bg-slate-50 py-3 rounded-lg font-bold text-slate-600 transition shadow-sm">
+                            <i class="fa-solid fa-backward"></i> 1ヶ月戻す
+                        </button>
+                        <div class="flex items-center justify-center text-xs text-slate-400">
+                           リセットは上のボタン
+                        </div>
+                        <button onclick="adjustAnnual(1)" class="bg-white border-2 border-slate-200 hover:border-slate-400 hover:bg-slate-50 py-3 rounded-lg font-bold text-slate-600 transition shadow-sm">
+                            1ヶ月進める <i class="fa-solid fa-forward"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel: Combined -->
+            <div id="panel-combined" class="p-6 control-panel hidden">
+                <div class="mb-4 bg-purple-50 p-4 rounded-lg border border-purple-100">
+                    <h3 class="font-bold text-purple-800 mb-2"><i class="fa-solid fa-wand-magic-sparkles"></i> 攻略のコツ</h3>
+                    <p class="text-sm text-purple-700">
+                        ① 「日付」を動かして位置を決め、<br>
+                        ② その位置から「時間」を動かして最終位置を特定します。
+                    </p>
+                </div>
+
+                <div class="flex flex-col gap-10">
+                    <!-- Step 1 Control -->
+                    <div class="relative border-l-4 border-green-500 pl-4 py-1">
+                        <h4 class="font-bold text-green-700 mb-4">① 日付を決める (年周運動: 30°/月)</h4>
+                        
+                        <div class="slider-container">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-xs font-bold text-slate-500">移動角: <span id="combined-date-info">0°</span></span>
+                                <span class="font-bold text-lg text-green-600" id="combined-date-val">1月10日</span>
+                            </div>
+                            <input type="range" id="combined-date-slider" min="0" max="11" value="0" step="1">
+                            <div id="scale-combined-date" class="slider-scale px-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 Control -->
+                    <div class="relative border-l-4 border-blue-500 pl-4 py-1">
+                        <h4 class="font-bold text-blue-700 mb-4">② 時間を決める (日周運動: 15°/時)</h4>
+                        
+                        <div class="slider-container">
+                             <div class="flex justify-between mb-1">
+                                <span class="text-xs font-bold text-slate-500">移動角: <span id="combined-time-info">0°</span></span>
+                                <span class="font-bold text-lg text-blue-600" id="combined-time-val">0:00</span>
+                            </div>
+                            <input type="range" id="combined-time-slider" min="-6" max="6" value="0" step="1">
+                            <div id="scale-combined-time" class="slider-scale px-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- Summary -->
+                    <div class="bg-slate-100 p-4 rounded-lg flex justify-between items-center border border-slate-200">
+                        <div class="text-sm font-bold text-slate-600">最終的な角度</div>
+                        <div class="text-xl font-bold text-purple-600" id="combined-total-val">南中 (0°)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-6 text-center text-sm">
+        <p>© 2026 Junior High Science App Project.</p>
+        <p>Created by Pro Science Teacher & Engineer.</p>
+    </footer>
+
+    <script>
+        const state = {
+            baseMonth: 1,
+            baseDay: 10,
+            baseHour: 0,
+            currentMonth: 1,
+            currentHour: 0,
+            mode: 'diurnal',
+            direction: 'south'
+        };
+
+        const canvas = document.getElementById('skyCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        function init() {
+            renderScales(); // 修正: DOM生成後にJSで目盛りを挿入
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            ['diurnal-slider', 'annual-slider', 'combined-date-slider', 'combined-time-slider'].forEach(id => {
+                document.getElementById(id).addEventListener('input', (e) => {
+                    if (id.includes('diurnal') && state.mode === 'diurnal') state.currentHour = parseInt(e.target.value);
+                    if (id.includes('annual') && state.mode === 'annual') state.currentMonth = 1 + parseInt(e.target.value);
+                    if (id.includes('combined-date') && state.mode === 'combined') state.currentMonth = 1 + parseInt(e.target.value);
+                    if (id.includes('combined-time') && state.mode === 'combined') state.currentHour = parseInt(e.target.value);
+                    updateDisplay();
+                });
+            });
+
+            setDirection('south');
+        }
+
+        function renderScales() {
+            // Helper to generate scale HTML
+            const timePoints = [-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6].map(h => {
+                let label = (h + 24) % 24 + ":00";
+                let displayH = h >= 0 ? h : h + 24; 
+                if(h === 0) displayH = "0"; 
+                else if(h < 0) displayH = 24 + h;
+                let timeLabel = `${displayH}:00`;
+                let isMajor = (h % 3 === 0);
+                return `<div class="scale-point" data-val="${h}">
+                    <div class="scale-line" style="height: ${isMajor ? '8px' : '4px'}; background-color: ${h===0 ? '#ef4444' : '#cbd5e1'}"></div>
+                    <div class="scale-label" style="font-weight: ${isMajor ? 'bold' : 'normal'}; color: ${h===0 ? '#ef4444' : ''}">${timeLabel}</div>
+                </div>`;
+            }).join('');
+
+            const monthPoints = [1,2,3,4,5,6,7,8,9,10,11,12].map((m, i) => {
+                return `<div class="scale-point" data-val="${i}">
+                    <div class="scale-line" style="height: 8px; background-color: ${m===1 ? '#ef4444' : '#cbd5e1'}"></div>
+                    <div class="scale-label" style="font-weight: bold; color: ${m===1 ? '#ef4444' : ''}">${m}月</div>
+                </div>`;
+            }).join('');
+
+            const simpleMonthPoints = [1,2,3,4,5,6,7,8,9,10,11,12].map((m, i) => `
+                <div class="scale-point" style="width:1px;">
+                    <div class="scale-line" style="height:5px; background-color:${m===1?'#ef4444':'#cbd5e1'}"></div>
+                    <div class="scale-label" style="color:${m===1?'#ef4444':''}">${m}</div>
+                </div>`).join('');
+
+            const simpleTimePoints = [-6,-3,0,3,6].map(h => {
+                let fullPoints = [-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6];
+                return fullPoints.map(p => {
+                    let isLabel = (p % 3 === 0);
+                    let displayH = p >= 0 ? p : p + 24; 
+                    if(p===0) displayH = "0";
+                    else if(p<0) displayH = 24+p;
+                    return `<div class="scale-point" style="width:1px;">
+                        <div class="scale-line" style="height:${isLabel?'6px':'3px'}; background-color:${p===0?'#ef4444':'#cbd5e1'}"></div>
+                        <div class="scale-label" style="display:${isLabel?'block':'none'}; color:${p===0?'#ef4444':''}">${displayH}:00</div>
+                    </div>`;
+                }).join('');
+            })[0];
+
+            document.getElementById('scale-diurnal').innerHTML = timePoints;
+            document.getElementById('scale-annual').innerHTML = monthPoints;
+            document.getElementById('scale-combined-date').innerHTML = simpleMonthPoints;
+            document.getElementById('scale-combined-time').innerHTML = simpleTimePoints;
+        }
+
+        function setDirection(dir) {
+            state.direction = dir;
+            const container = document.getElementById('skySwitchContainer');
+            const btnSouth = document.getElementById('btn-south');
+            const btnNorth = document.getElementById('btn-north');
+            const starLabel = document.getElementById('starLabel');
+
+            if (dir === 'north') {
+                container.classList.add('north');
+                btnNorth.classList.remove('text-slate-400');
+                btnNorth.classList.add('text-white');
+                btnSouth.classList.remove('text-white');
+                btnSouth.classList.add('text-slate-400');
+                starLabel.innerText = "星Bの位置";
+            } else {
+                container.classList.remove('north');
+                btnSouth.classList.remove('text-slate-400');
+                btnSouth.classList.add('text-white');
+                btnNorth.classList.remove('text-white');
+                btnNorth.classList.add('text-slate-400');
+                starLabel.innerText = "星Aの位置";
+            }
+            updateDisplay();
+        }
+
+        function resizeCanvas() {
+            const parent = canvas.parentElement;
+            canvas.width = parent.clientWidth;
+            canvas.height = parent.clientHeight;
+            draw();
+        }
+
+        function draw() {
+            const W = canvas.width;
+            const H = canvas.height;
+            
+            ctx.clearRect(0, 0, W, H);
+            drawStaticStars(W, H); 
+
+            if (state.direction === 'south') {
+                drawSouthSky(W, H);
+            } else {
+                drawNorthSky(W, H);
+            }
+        }
+
+        function drawSouthSky(W, H) {
+            const CX = W / 2;
+            const CY = H * 0.8; 
+            const R = Math.min(W, H) * 0.65; // 修正: 0.7 -> 0.65 安全マージン確保
+
+            ctx.fillStyle = "#111827"; 
+            ctx.fillRect(0, CY, W, H - CY);
+            ctx.beginPath();
+            ctx.moveTo(0, CY);
+            ctx.lineTo(W, CY);
+            ctx.strokeStyle = "#334155";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            drawSouthGrid(CX, CY, R);
+
+            ctx.fillStyle = "#94a3b8";
+            ctx.font = "bold 20px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("南", CX, CY + 40);
+            ctx.fillText("東", CX - R, CY + 40);
+            ctx.fillText("西", CX + R, CY + 40);
+
+            const angleDeg = calculateCurrentAngle();
+            
+            if (state.mode === 'combined') {
+                const monthDiff = state.currentMonth - state.baseMonth;
+                const baseAngle = monthDiff * 30;
+                drawSouthStar(CX, CY, R, baseAngle, true);
+            }
+
+            drawSouthStar(CX, CY, R, angleDeg, false);
+            updateInfoText(angleDeg);
+        }
+
+        function drawSouthGrid(cx, cy, r) {
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+            ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+            ctx.font = "12px sans-serif";
+            ctx.textAlign = "center";
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, Math.PI, 0); 
+            ctx.stroke();
+
+            for(let i = -6; i <= 6; i++) {
+                const angleDeg = i * 15;
+                const radCalc = angleDeg * Math.PI / 180;
+                const x = cx + r * Math.sin(radCalc);
+                const y = cy - r * Math.cos(radCalc);
+
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(x, y);
+                ctx.setLineDash([2, 4]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                if (Math.abs(angleDeg) <= 90) {
+                    const labelR = r + 15;
+                    const lx = cx + labelR * Math.sin(radCalc);
+                    const ly = cy - labelR * Math.cos(radCalc);
+                    
+                    let labelText = Math.abs(angleDeg) + "°";
+                    if (Math.abs(angleDeg) === 0) labelText = "0°"; 
+
+                    ctx.fillText(labelText, lx, ly + 4);
+                }
+            }
+        }
+
+        function drawSouthStar(cx, cy, r, angleDeg, isGhost) {
+             const rad = angleDeg * Math.PI / 180;
+             const sx = cx + r * Math.sin(rad);
+             const sy = cy - r * Math.cos(rad);
+
+             if (sy <= cy) { 
+                if (isGhost) {
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, 8, 0, Math.PI * 2);
+                    ctx.fillStyle = "rgba(74, 222, 128, 0.5)"; 
+                    ctx.fill();
+                    ctx.fillStyle = "rgba(74, 222, 128, 0.8)";
+                    ctx.font = "10px sans-serif";
+                    ctx.fillText("日付の位置", sx, sy - 15);
+                } else {
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.lineTo(sx, sy);
+                    ctx.strokeStyle = "rgba(250, 204, 21, 0.5)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = "yellow";
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, 12, 0, Math.PI * 2);
+                    ctx.fillStyle = "#fbbf24";
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    
+                    ctx.fillStyle = "white";
+                    ctx.font = "bold 14px sans-serif";
+                    ctx.fillText("星A", sx, sy - 20);
+                }
+             } else {
+                 if(!isGhost) {
+                    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+                    ctx.font = "italic 14px sans-serif";
+                    ctx.fillText("地平線の下", sx, cy + 20);
+                 }
+             }
+        }
+
+        function drawNorthSky(W, H) {
+            const CX = W / 2;
+            const CY = H * 0.5;
+            const R = Math.min(W, H) * 0.3; // 修正: 0.35 -> 0.3 安全マージン確保
+
+            const HorizonY = H * 0.95; 
+            
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = "white";
+            ctx.beginPath();
+            ctx.arc(CX, CY, 4, 0, Math.PI * 2);
+            ctx.fillStyle = "#fff";
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillText("北極星", CX, CY + 20); 
+
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(CX, CY, R, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            ctx.fillStyle = "rgba(255, 255, 255, 0.6)"; // 文字を明るく
+            ctx.font = "11px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+
+            for(let i=0; i<24; i++) {
+                const deg = i * 15;
+                const rad = (-90 - deg) * Math.PI / 180;
+                
+                const lx = CX + R * Math.cos(rad);
+                const ly = CY + R * Math.sin(rad);
+                
+                ctx.beginPath();
+                ctx.moveTo(CX, CY);
+                ctx.lineTo(lx, ly);
+                ctx.setLineDash([2, 4]);
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                const labelR = R + 25;
+                const tx = CX + labelR * Math.cos(rad);
+                const ty = CY + labelR * Math.sin(rad);
+                
+                if (deg % 30 === 0) { 
+                    ctx.fillText(deg, tx, ty);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(tx, ty, 1.5, 0, Math.PI*2);
+                    ctx.fillStyle = "rgba(255,255,255,0.3)";
+                    ctx.fill();
+                    ctx.fillStyle = "rgba(255, 255, 255, 0.6)"; 
+                }
+            }
+
+            ctx.fillStyle = "#111827"; 
+            ctx.fillRect(0, HorizonY, W, H - HorizonY);
+            ctx.beginPath();
+            ctx.moveTo(0, HorizonY);
+            ctx.lineTo(W, HorizonY);
+            ctx.strokeStyle = "#334155";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = "#94a3b8";
+            ctx.font = "bold 20px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "bottom";
+            ctx.fillText("北", CX, HorizonY - 10);
+            ctx.fillText("東", W - 40, HorizonY - 20); 
+            ctx.fillText("西", 40, HorizonY - 20);
+
+            const totalShift = calculateCurrentAngle(); 
+            const currentRad = (-90 - totalShift) * Math.PI / 180;
+            
+            const sx = CX + R * Math.cos(currentRad);
+            const sy = CY + R * Math.sin(currentRad);
+
+            if (state.mode === 'combined') {
+                 const monthDiff = state.currentMonth - state.baseMonth;
+                 const baseShift = monthDiff * 30;
+                 const baseRad = (-90 - baseShift) * Math.PI / 180;
+                 const bx = CX + R * Math.cos(baseRad);
+                 const by = CY + R * Math.sin(baseRad);
+                 
+                 drawNorthStar(bx, by, true);
+            }
+
+            drawNorthStar(sx, sy, false);
+            updateInfoTextNorth(totalShift);
+        }
+
+        function drawNorthStar(x, y, isGhost) {
+            if (isGhost) {
+                ctx.beginPath();
+                ctx.arc(x, y, 8, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(74, 222, 128, 0.5)"; 
+                ctx.fill();
+            } else {
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = "cyan"; 
+                ctx.beginPath();
+                ctx.arc(x, y, 12, 0, Math.PI * 2);
+                ctx.fillStyle = "#22d3ee"; 
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                
+                ctx.fillStyle = "white";
+                ctx.font = "bold 14px sans-serif";
+                ctx.fillText("星B", x + 10, y + 10);
+            }
+        }
+
+        function calculateCurrentAngle() {
+            const diurnalShift = state.currentHour * 15;
+            const monthDiff = state.currentMonth - state.baseMonth;
+            const annualShift = monthDiff * 30;
+            return diurnalShift + annualShift;
+        }
+
+        function drawStaticStars(w, h) {
+            const seed = 123;
+            for(let i=0; i<50; i++) {
+                const x = (Math.sin(i * 12.9898) * 43758.5453 % 1) * w; 
+                const y = Math.abs((Math.cos(i * 42.12) * 232.12 % 1) * h * 0.9);
+                ctx.fillStyle = "rgba(255, 255, 255, " + (Math.random() * 0.5 + 0.2) + ")";
+                ctx.beginPath();
+                ctx.arc(x, y, Math.random() * 1.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function switchMode(mode) {
+            state.mode = mode;
+            
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'border-b-4', 'border-blue-600', 'bg-blue-500', 'text-white'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.add('text-slate-600'));
+            
+            const activeBtn = document.getElementById(`tab-${mode}`);
+            activeBtn.classList.add('active');
+            activeBtn.classList.remove('text-slate-600');
+
+            document.querySelectorAll('.control-panel').forEach(p => p.classList.add('hidden'));
+            document.getElementById(`panel-${mode}`).classList.remove('hidden');
+
+            state.currentMonth = 1;
+            state.currentHour = 0;
+            
+            document.getElementById('diurnal-slider').value = 0;
+            document.getElementById('annual-slider').value = 0;
+            document.getElementById('combined-date-slider').value = 0;
+            document.getElementById('combined-time-slider').value = 0;
+
+            updateDisplay();
+        }
+
+        function adjustDiurnal(delta) {
+            let newVal = state.currentHour + delta;
+            if(newVal > 6) newVal = 6;
+            if(newVal < -6) newVal = -6;
+            state.currentHour = newVal;
+            document.getElementById('diurnal-slider').value = newVal;
+            updateDisplay();
+        }
+
+        function adjustAnnual(delta) {
+            let newVal = state.currentMonth + delta;
+            if(newVal > 12) newVal = 12;
+            let sliderVal = newVal - 1;
+            if(sliderVal > 11) sliderVal = 11;
+            if(sliderVal < 0) sliderVal = 0;
+            
+            state.currentMonth = sliderVal + 1;
+            document.getElementById('annual-slider').value = sliderVal;
+            updateDisplay();
+        }
+
+        function resetAll() {
+            state.currentMonth = 1;
+            state.currentHour = 0;
+            document.getElementById('diurnal-slider').value = 0;
+            document.getElementById('annual-slider').value = 0;
+            document.getElementById('combined-date-slider').value = 0;
+            document.getElementById('combined-time-slider').value = 0;
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            const months = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
+            
+            let hourText = "0:00";
+            let rawHour = state.currentHour; 
+            let displayH = 0 + rawHour;
+            if (displayH < 0) displayH += 24;
+            hourText = displayH + ":00";
+
+            if (state.mode === 'diurnal') {
+                document.getElementById('diurnal-val').innerText = (rawHour > 0 ? "+" : "") + rawHour + "時間後 (" + hourText + ")";
+                document.getElementById('displayDate').innerText = "1月10日";
+                document.getElementById('displayTime').innerText = hourText;
+            } else if (state.mode === 'annual') {
+                document.getElementById('annual-val').innerText = months[state.currentMonth - 1] + "10日";
+                document.getElementById('displayDate').innerText = months[state.currentMonth - 1] + "10日";
+                document.getElementById('displayTime').innerText = "0:00";
+            } else if (state.mode === 'combined') {
+                document.getElementById('combined-date-val').innerText = months[state.currentMonth - 1] + "10日";
+                document.getElementById('combined-time-val').innerText = hourText;
+                
+                const monthDiff = state.currentMonth - 1;
+                const dateAngle = monthDiff * 30;
+                document.getElementById('combined-date-info').innerText = `${dateAngle}°`;
+
+                const timeAngle = rawHour * 15;
+                const timeDir = rawHour >= 0 ? "西" : "東"; 
+                document.getElementById('combined-time-info').innerText = `${Math.abs(timeAngle)}° (${timeDir}へ)`;
+                
+                document.getElementById('displayDate').innerText = months[state.currentMonth - 1] + "10日";
+                document.getElementById('displayTime').innerText = hourText;
+
+                const totalAngle = dateAngle + timeAngle;
+                let finalDirText = "";
+                if (state.direction === 'south') {
+                     if(totalAngle > 0) finalDirText = `南から西へ ${Math.abs(totalAngle)}°`;
+                     else if(totalAngle < 0) finalDirText = `南から東へ ${Math.abs(totalAngle)}°`;
+                     else finalDirText = "南中";
+                     if(Math.abs(totalAngle) > 90) finalDirText = "地平線の下";
+                } else {
+                     let normalized = totalAngle % 360;
+                     if(normalized < 0) normalized += 360;
+                     finalDirText = `反時計回りに ${normalized}° 回転`;
+                }
+                document.getElementById('combined-total-val').innerText = finalDirText;
+            }
+
+            draw();
+        }
+
+        function updateInfoText(angle) {
+            let direction = "";
+            let absAngle = Math.abs(angle);
+            
+            if (Math.abs(angle) < 2) direction = "南中 (0°)";
+            else if (angle < 0) direction = `南から東へ ${absAngle}°`;
+            else direction = `南から西へ ${absAngle}°`;
+
+            if (absAngle > 90) direction = "地平線の下";
+
+            document.getElementById('positionInfo').innerText = direction;
+        }
+
+        function updateInfoTextNorth(totalShift) {
+            let deg = totalShift % 360;
+            if(deg < 0) deg += 360;
+            
+            let text = `反時計回りに ${deg}°`;
+            if (deg === 0) text = "北極星の真上 (0°)";
+            
+            document.getElementById('positionInfo').innerText = text;
+        }
+
+        window.onload = init;
+
+    </script>
+</body>
+</html>
