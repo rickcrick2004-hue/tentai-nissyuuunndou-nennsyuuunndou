@@ -170,7 +170,7 @@
                 <i class="fa-solid fa-star text-yellow-400"></i>
                 AstroMaster 
                 <span class="text-[10px] md:text-sm font-normal text-red-400 bg-red-950/30 px-2 py-0.5 rounded border border-red-800/50">※縦画面で使ってね</span>
-                <span class="text-[10px] md:text-xs font-normal text-slate-400 ml-auto md:ml-2">ver 3.4.0</span>
+                <span class="text-[10px] md:text-xs font-normal text-slate-400 ml-auto md:ml-2">ver 3.4.2</span>
             </h1>
             
             <div class="flex items-center gap-2 md:gap-4 scale-90 md:scale-100 origin-right">
@@ -433,15 +433,15 @@
                         <h4 class="text-xs font-bold text-purple-600 bg-purple-100 inline-block px-2 py-1 rounded mb-1">Level 3: 応用 (入試頻出)</h4>
                         <div class="flex flex-col gap-2">
                             <button onclick="startProblem(10)" class="text-left bg-white border border-slate-200 p-2 md:p-3 rounded-lg shadow-sm hover:bg-purple-50 hover:border-purple-300 transition text-sm">
-                                <span class="font-bold block mb-1">Q1. 南の空 2月10日 22時</span>
+                                <span class="font-bold block mb-1">Q1. 南の空 2月9日 22時</span>
                                 <div class="text-xs text-slate-500">1ヶ月進み、2時間戻ると？</div>
                             </button>
                             <button onclick="startProblem(11)" class="text-left bg-white border border-slate-200 p-2 md:p-3 rounded-lg shadow-sm hover:bg-purple-50 hover:border-purple-300 transition text-sm">
-                                <span class="font-bold block mb-1">Q2. 南の空 3月10日 20時</span>
+                                <span class="font-bold block mb-1">Q2. 南の空 3月9日 20時</span>
                                 <div class="text-xs text-slate-500">2ヶ月進み、4時間戻ると？</div>
                             </button>
                             <button onclick="startProblem(12)" class="text-left bg-white border border-slate-200 p-2 md:p-3 rounded-lg shadow-sm hover:bg-purple-50 hover:border-purple-300 transition text-sm">
-                                <span class="font-bold block mb-1">Q3. 北の空 5月10日 21時</span>
+                                <span class="font-bold block mb-1">Q3. 北の空 5月9日 21時</span>
                                 <div class="text-xs text-slate-500">4ヶ月進み、3時間戻る（反時計＋時計）</div>
                             </button>
                             <button onclick="startProblem(13)" class="text-left bg-white border border-slate-200 p-2 md:p-3 rounded-lg shadow-sm hover:bg-purple-50 hover:border-purple-300 transition text-sm">
@@ -465,21 +465,23 @@
     </footer>
 
     <script>
-        // 問題データ
+        // 問題データ (日付を9日に修正)
         const problems = [
             { id: 0, level: 'Level 1: 日周', title: 'Q1. 南の空 3時間後', text: '現在(1月10日0時)、星Aは南中しています。スライダーを動かして3時間後の位置を確認しなさい。', answer: '西へ 45°', desc: '1時間で15°西へ動くので、3時間では 15×3=45° 西へ動きます。', mode: 'diurnal', dir: 'south' },
-            { id: 1, level: 'Level 1: 日周', title: 'Q2. 南の空 東60°の時刻', text: '星Aが東の空60°の位置にあるとき、時刻は何時ですか？スライダーを戻して確認しなさい。', answer: '20:00 (4時間前)', desc: '60° ÷ 15° = 4時間。東にあるということは過去の時間なので、4時間戻します。', mode: 'diurnal', dir: 'south' },
+            { id: 1, level: 'Level 1: 日周', title: 'Q2. 南の空 東60°の時刻', text: '星Aが東の空60°の位置にあるとき、時刻は何時ですか？スライダーを戻して確認しなさい。', answer: '20:00 (1月9日)', desc: '60° ÷ 15° = 4時間。東にあるということは4時間過去（0:00の4時間前）なので、日付は前日の1月9日になります。', mode: 'diurnal', dir: 'south' },
             { id: 2, level: 'Level 1: 日周', title: 'Q3. 北の空 反時計90°', text: '北極星の真上にある星Bが、反時計回りに90°移動するのは何時間後ですか？', answer: '6時間後 (翌朝6:00)', desc: '90° ÷ 15° = 6時間。北の空の星は反時計回りに動きます。', mode: 'diurnal', dir: 'north' },
-            { id: 3, level: 'Level 1: 日周', title: 'Q4. 北の空 2時間前', text: '北極星の真上にある星Bは、2時間前にはどの位置にありましたか？', answer: '時計回りに 30°', desc: '1時間で15°なので、2時間では30°。時間を戻すと、北の空の星は時計回りに動きます。', mode: 'diurnal', dir: 'north' },
+            { id: 3, level: 'Level 1: 日周', title: 'Q4. 北の空 2時間前', text: '北極星の真上にある星Bは、2時間前にはどの位置にありましたか？', answer: '時計回りに 30° (1月9日)', desc: '1時間で15°なので、2時間では30°。時間を戻すと日付は前日の1月9日になり、星は時計回りに動きます。', mode: 'diurnal', dir: 'north' },
             { id: 4, level: 'Level 1: 日周', title: 'Q5. 南の空 西30°の時刻', text: '南中している星Aが、西へ30°の位置に見えるのは何時ですか？', answer: '2:00 (2時間後)', desc: '30° ÷ 15° = 2時間。西へ移動するのは時間が進んだときです。', mode: 'diurnal', dir: 'south' },
+            
             { id: 5, level: 'Level 2: 年周', title: 'Q1. 南の空 3ヶ月後', text: '1月10日に南中している星Aは、3ヶ月後の4月10日の同じ時刻には、どこに見えますか？', answer: '西へ 90°', desc: '1ヶ月で30°西へ動くので、3ヶ月では 30×3=90° 西へ動きます。', mode: 'annual', dir: 'south' },
             { id: 6, level: 'Level 2: 年周', title: 'Q2. 南の空 東30°の月', text: '星Aが東へ30°の位置に見えるのは、1月10日から見ておよそ何ヶ月前ですか？', answer: '1ヶ月前 (12月)', desc: '東に見える＝季節を戻す必要があります。1ヶ月で30°なので、1ヶ月前です。', mode: 'annual', dir: 'south' },
             { id: 7, level: 'Level 2: 年周', title: 'Q3. 北の空 半年後', text: '北極星の真上にある星Bが、真下（180°）に見えるのは何ヶ月後？', answer: '6ヶ月後 (7月)', desc: '180° ÷ 30° = 6ヶ月後。季節が半年変わると正反対に見えます。', mode: 'annual', dir: 'north' },
             { id: 8, level: 'Level 2: 年周', title: 'Q4. 南の空 東60°の月', text: '1月10日に南中する星Aが、東へ60°の位置に見えるのは何月ですか？', answer: '11月 (2ヶ月前)', desc: '60° ÷ 30° = 2ヶ月。東に見えるのは過去の季節です。', mode: 'annual', dir: 'south' },
             { id: 9, level: 'Level 2: 年周', title: 'Q5. 北の空 3ヶ月後', text: '北極星の真上にある星Bは、3ヶ月後の同じ時刻にはどの位置にありますか？', answer: '反時計回りに 90°', desc: '1ヶ月で30°反時計回りに動くので、3ヶ月では 90° 動きます。', mode: 'annual', dir: 'north' },
-            { id: 10, level: 'Level 3: 応用', title: 'Q1. 南の空 2月10日 22時', text: '1月10日0時に南中する星Aは、2月10日の22時(2時間前)にはどの位置に見えますか？', answer: '南中 (0°)', desc: '①年周: 2月(+30°西)。②日周: 22時(-30°東)。差し引き0°で元の位置に見えます。「1ヶ月進むと2時間早まる」の法則です。', mode: 'combined', dir: 'south' },
-            { id: 11, level: 'Level 3: 応用', title: 'Q2. 南の空 3月10日 20時', text: '1月10日0時に南中する星Aは、3月10日の20時(4時間前)にはどの位置に見えますか？', answer: '南中 (0°)', desc: '①年周: 3月(+60°西)。②日周: 20時(-60°東)。これも相殺されて南中に見えます。', mode: 'combined', dir: 'south' },
-            { id: 12, level: 'Level 3: 応用', title: 'Q3. 北の空 5月10日 21時', text: '1月10日0時に真上の星Bは、5月10日21時にはどの位置？(5月=+4ヶ月, 21時=-3時間)', answer: '反時計回りに 75°', desc: '①年周: 4ヶ月×30=120°(反時計)。②日周: -3時間×15=-45°(時計)。合計: 120-45=75°(反時計)の位置です。', mode: 'combined', dir: 'north' },
+
+            { id: 10, level: 'Level 3: 応用', title: 'Q1. 南の空 2月9日 22時', text: '1月10日0時に南中する星Aは、2月9日の22時(2時間前)にはどの位置に見えますか？', answer: '南中 (0°)', desc: '①年周: 2月(+30°西)。②日周: 22時(-30°東)。差し引き0°で元の位置に見えます。「1ヶ月進むと2時間早まる」の法則です。日付は10日の2時間前なので9日になります。', mode: 'combined', dir: 'south' },
+            { id: 11, level: 'Level 3: 応用', title: 'Q2. 南の空 3月9日 20時', text: '1月10日0時に南中する星Aは、3月9日の20時(4時間前)にはどの位置に見えますか？', answer: '南中 (0°)', desc: '①年周: 3月(+60°西)。②日周: 20時(-60°東)。これも相殺されて南中に見えます。日付は前日の9日です。', mode: 'combined', dir: 'south' },
+            { id: 12, level: 'Level 3: 応用', title: 'Q3. 北の空 5月9日 21時', text: '1月10日0時に真上の星Bは、5月9日21時にはどの位置？', answer: '反時計回りに 75°', desc: '①年周: 4ヶ月×30=120°(反時計)。②日周: -3時間×15=-45°(時計)。合計: 120-45=75°(反時計)の位置です。日付は前日の9日になります。', mode: 'combined', dir: 'north' },
             { id: 13, level: 'Level 3: 応用', title: 'Q4. 南の空 12月10日 2時', text: '1月10日0時に南中する星Aは、1ヶ月前の12月10日の午前2時にはどの位置に見えますか？', answer: '南中 (0°)', desc: '①年周: 12月は1ヶ月前なので東へ30°(-30°)。②日周: 2時は2時間後なので西へ30°(+30°)。合計0°で南中に戻ります。', mode: 'combined', dir: 'south' },
             { id: 14, level: 'Level 3: 応用', title: 'Q5. 北の空 11月10日 4時', text: '1月10日0時に真上の星Bは、2ヶ月前の11月10日の午前4時にはどの位置？', answer: '北極星の真上 (0°)', desc: '①年周: 2ヶ月前は時計回りに60°。②日周: 4時間後は反時計回りに60°。相殺されて元の位置に見えます。', mode: 'combined', dir: 'north' },
         ];
@@ -897,16 +899,17 @@
             let d = (rawHour < 0) ? 9 : 10;
             const dateText = `${m}月${d}日`;
             const timeDiffLabel = (rawHour > 0 ? "+" : "") + rawHour + "時間後 (" + hourText + ")";
+            
             if (state.mode === 'diurnal') {
                 document.getElementById('diurnal-val').innerText = timeDiffLabel;
-                document.getElementById('displayDate').innerText = "1月" + d + "日";
+                document.getElementById('displayDate').innerText = m + "月" + d + "日";
                 document.getElementById('displayTime').innerText = hourText;
             } else if (state.mode === 'annual') {
                 document.getElementById('annual-val').innerText = m + "月10日";
                 document.getElementById('displayDate').innerText = m + "月10日";
                 document.getElementById('displayTime').innerText = "0:00";
             } else if (state.mode === 'combined') {
-                document.getElementById('combined-date-val').innerText = m + "月10日";
+                document.getElementById('combined-date-val').innerText = m + "月" + d + "日";
                 document.getElementById('combined-time-val').innerText = hourText;
                 document.getElementById('combined-date-info').innerText = `${state.currentMonthOffset * 30}°`;
                 let timeInfoText = "";
