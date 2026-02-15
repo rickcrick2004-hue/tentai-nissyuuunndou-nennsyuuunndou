@@ -2,8 +2,9 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <!-- viewport設定の強化: ズーム防止とセーフエリア対応 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>AstroMaster - 星の動き完全攻略 ver 3.3.0</title>
+    <title>AstroMaster - 星の動き完全攻略 ※縦画面推奨</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -35,7 +36,7 @@
         
         .slider-container {
             position: relative;
-            padding-bottom: 20px;
+            padding-bottom: 24px;
             touch-action: none;
         }
 
@@ -112,7 +113,7 @@
             color: #64748b;
             white-space: nowrap;
             position: absolute;
-            top: 10px;
+            top: 12px;
             transform: translateX(-50%);
         }
 
@@ -150,7 +151,10 @@
 
         .question-banner {
             transition: transform 0.3s ease-in-out;
-            transform: translateY(-120%);
+            transform: translateY(120%);
+            bottom: 0;
+            left: 0;
+            width: 100%;
         }
         .question-banner.show {
             transform: translateY(0);
@@ -164,7 +168,9 @@
         <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
             <h1 class="text-lg md:text-2xl font-bold flex items-center gap-2">
                 <i class="fa-solid fa-star text-yellow-400"></i>
-                AstroMaster <span class="text-xs font-normal text-slate-400 ml-2">ver 3.3.0</span>
+                AstroMaster 
+                <span class="text-[10px] md:text-sm font-normal text-red-400 bg-red-950/30 px-2 py-0.5 rounded border border-red-800/50">※縦画面で使ってね</span>
+                <span class="text-[10px] md:text-xs font-normal text-slate-400 ml-auto md:ml-2">ver 3.4.0</span>
             </h1>
             
             <div class="flex items-center gap-2 md:gap-4 scale-90 md:scale-100 origin-right">
@@ -206,8 +212,8 @@
                 </div>
             </div>
 
-            <!-- Question Banner -->
-            <div id="question-banner" class="question-banner absolute top-0 left-0 w-full bg-slate-900/60 backdrop-blur-sm text-white p-3 md:p-4 shadow-lg z-10 border-b border-white/20">
+            <!-- Question Banner (Bottom Overlay) -->
+            <div id="question-banner" class="question-banner absolute bottom-0 left-0 w-full bg-slate-900/80 backdrop-blur-md text-white p-3 md:p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-10 border-t border-white/20">
                 <div class="flex justify-between items-start gap-4">
                     <div class="flex-1">
                         <div class="flex items-center gap-2 mb-1">
@@ -216,19 +222,19 @@
                         </div>
                         <p class="text-sm md:text-base leading-snug drop-shadow-md" id="q-text">ここに問題文が入ります。</p>
                         
-                        <div id="q-answer-area" class="mt-3 hidden bg-slate-800/90 p-2 rounded text-sm border border-white/10">
+                        <div id="q-answer-area" class="mt-3 hidden bg-slate-800/90 p-3 rounded text-sm border border-white/10">
                             <p class="font-bold text-yellow-300 mb-1">【正解】 <span id="q-answer-val"></span></p>
                             <p class="text-xs md:text-sm text-slate-200" id="q-answer-desc"></p>
                         </div>
                     </div>
                     <div class="flex flex-col gap-2 shrink-0">
-                        <button onclick="closeQuestion()" class="text-slate-300 hover:text-white text-xl">
+                        <button onclick="closeQuestion()" class="text-slate-300 hover:text-white text-xl p-1">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
                 </div>
-                <div class="mt-2 text-center" id="q-btn-area">
-                    <button onclick="showAnswer()" class="bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold py-1 px-4 rounded-full text-sm shadow-md transition">
+                <div class="mt-3 text-center" id="q-btn-area">
+                    <button onclick="showAnswer()" class="bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold py-1.5 px-6 rounded-full text-sm shadow-md transition transform active:scale-95">
                         正解を見る
                     </button>
                 </div>
@@ -466,13 +472,11 @@
             { id: 2, level: 'Level 1: 日周', title: 'Q3. 北の空 反時計90°', text: '北極星の真上にある星Bが、反時計回りに90°移動するのは何時間後ですか？', answer: '6時間後 (翌朝6:00)', desc: '90° ÷ 15° = 6時間。北の空の星は反時計回りに動きます。', mode: 'diurnal', dir: 'north' },
             { id: 3, level: 'Level 1: 日周', title: 'Q4. 北の空 2時間前', text: '北極星の真上にある星Bは、2時間前にはどの位置にありましたか？', answer: '時計回りに 30°', desc: '1時間で15°なので、2時間では30°。時間を戻すと、北の空の星は時計回りに動きます。', mode: 'diurnal', dir: 'north' },
             { id: 4, level: 'Level 1: 日周', title: 'Q5. 南の空 西30°の時刻', text: '南中している星Aが、西へ30°の位置に見えるのは何時ですか？', answer: '2:00 (2時間後)', desc: '30° ÷ 15° = 2時間。西へ移動するのは時間が進んだときです。', mode: 'diurnal', dir: 'south' },
-            
             { id: 5, level: 'Level 2: 年周', title: 'Q1. 南の空 3ヶ月後', text: '1月10日に南中している星Aは、3ヶ月後の4月10日の同じ時刻には、どこに見えますか？', answer: '西へ 90°', desc: '1ヶ月で30°西へ動くので、3ヶ月では 30×3=90° 西へ動きます。', mode: 'annual', dir: 'south' },
             { id: 6, level: 'Level 2: 年周', title: 'Q2. 南の空 東30°の月', text: '星Aが東へ30°の位置に見えるのは、1月10日から見ておよそ何ヶ月前ですか？', answer: '1ヶ月前 (12月)', desc: '東に見える＝季節を戻す必要があります。1ヶ月で30°なので、1ヶ月前です。', mode: 'annual', dir: 'south' },
             { id: 7, level: 'Level 2: 年周', title: 'Q3. 北の空 半年後', text: '北極星の真上にある星Bが、真下（180°）に見えるのは何ヶ月後？', answer: '6ヶ月後 (7月)', desc: '180° ÷ 30° = 6ヶ月後。季節が半年変わると正反対に見えます。', mode: 'annual', dir: 'north' },
             { id: 8, level: 'Level 2: 年周', title: 'Q4. 南の空 東60°の月', text: '1月10日に南中する星Aが、東へ60°の位置に見えるのは何月ですか？', answer: '11月 (2ヶ月前)', desc: '60° ÷ 30° = 2ヶ月。東に見えるのは過去の季節です。', mode: 'annual', dir: 'south' },
             { id: 9, level: 'Level 2: 年周', title: 'Q5. 北の空 3ヶ月後', text: '北極星の真上にある星Bは、3ヶ月後の同じ時刻にはどの位置にありますか？', answer: '反時計回りに 90°', desc: '1ヶ月で30°反時計回りに動くので、3ヶ月では 90° 動きます。', mode: 'annual', dir: 'north' },
-
             { id: 10, level: 'Level 3: 応用', title: 'Q1. 南の空 2月10日 22時', text: '1月10日0時に南中する星Aは、2月10日の22時(2時間前)にはどの位置に見えますか？', answer: '南中 (0°)', desc: '①年周: 2月(+30°西)。②日周: 22時(-30°東)。差し引き0°で元の位置に見えます。「1ヶ月進むと2時間早まる」の法則です。', mode: 'combined', dir: 'south' },
             { id: 11, level: 'Level 3: 応用', title: 'Q2. 南の空 3月10日 20時', text: '1月10日0時に南中する星Aは、3月10日の20時(4時間前)にはどの位置に見えますか？', answer: '南中 (0°)', desc: '①年周: 3月(+60°西)。②日周: 20時(-60°東)。これも相殺されて南中に見えます。', mode: 'combined', dir: 'south' },
             { id: 12, level: 'Level 3: 応用', title: 'Q3. 北の空 5月10日 21時', text: '1月10日0時に真上の星Bは、5月10日21時にはどの位置？(5月=+4ヶ月, 21時=-3時間)', answer: '反時計回りに 75°', desc: '①年周: 4ヶ月×30=120°(反時計)。②日周: -3時間×15=-45°(時計)。合計: 120-45=75°(反時計)の位置です。', mode: 'combined', dir: 'north' },
@@ -513,10 +517,8 @@
             setDirection('south');
         }
 
-        // --- Problem Logic ---
         function startProblem(id) {
             const p = problems[id];
-            
             resetAll();
             setDirection(p.dir);
             switchMode(p.mode);
@@ -555,15 +557,13 @@
 
         function renderScales() {
             const timePoints = [-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6].map(h => {
-                let label = (h + 24) % 24 + ":00";
                 let displayH = h >= 0 ? h : h + 24; 
                 if(h === 0) displayH = "0"; 
                 else if(h < 0) displayH = 24 + h;
-                let timeLabel = `${displayH}:00`;
                 let isMajor = (h % 3 === 0);
                 return `<div class="scale-point" data-val="${h}">
                     <div class="scale-line" style="height: ${isMajor ? '8px' : '4px'}; background-color: ${h===0 ? '#ef4444' : '#cbd5e1'}"></div>
-                    <div class="scale-label" style="font-weight: ${isMajor ? 'bold' : 'normal'}; color: ${h===0 ? '#ef4444' : ''}">${timeLabel}</div>
+                    <div class="scale-label" style="font-weight: ${isMajor ? 'bold' : 'normal'}; color: ${h===0 ? '#ef4444' : ''}">${displayH}</div>
                 </div>`;
             }).join('');
 
@@ -573,7 +573,7 @@
                 let isMajor = (offset % 3 === 0);
                 return `<div class="scale-point" data-val="${offset}">
                     <div class="scale-line" style="height: ${isMajor ? '8px' : '4px'}; background-color: ${isCenter ? '#ef4444' : '#cbd5e1'}"></div>
-                    <div class="scale-label" style="font-weight: ${isCenter ? 'bold' : 'normal'}; color: ${isCenter ? '#ef4444' : ''}">${m}月</div>
+                    <div class="scale-label" style="font-weight: ${isCenter ? 'bold' : 'normal'}; color: ${isCenter ? '#ef4444' : ''}">${m}</div>
                 </div>`;
             }).join('');
 
@@ -590,7 +590,6 @@
                 let displayH = h >= 0 ? h : h + 24; 
                 if(h === 0) displayH = "0"; 
                 else if(h < 0) displayH = 24 + h;
-                
                 let isCenter = (h === 0);
                 return `<div class="scale-point" style="width:1px;">
                     <div class="scale-line" style="height:6px; background-color:${isCenter?'#ef4444':'#cbd5e1'}"></div>
@@ -610,28 +609,21 @@
             const btnSouth = document.getElementById('btn-south');
             const btnNorth = document.getElementById('btn-north');
             const starLabel = document.getElementById('starLabel');
-
             const diurnalText = document.getElementById('diurnal-rule-text');
             const annualText = document.getElementById('annual-rule-text');
 
             if (dir === 'north') {
                 container.classList.add('north');
-                btnNorth.classList.remove('text-slate-400');
-                btnNorth.classList.add('text-white');
-                btnSouth.classList.remove('text-white');
-                btnSouth.classList.add('text-slate-400');
+                btnNorth.classList.replace('text-slate-400', 'text-white');
+                btnSouth.classList.replace('text-white', 'text-slate-400');
                 starLabel.innerText = "星Bの位置";
-
                 diurnalText.innerHTML = '地球が自転するため、星は北極星を中心に1時間に<span class="font-bold text-red-500">15°</span>ずつ<span class="font-bold">反時計回り</span>に動きます。';
                 annualText.innerHTML = '地球が公転するため、星は北極星を中心に1ヶ月に<span class="font-bold text-red-500">30°</span>ずつ<span class="font-bold">反時計回り</span>に動きます。';
             } else {
                 container.classList.remove('north');
-                btnSouth.classList.remove('text-slate-400');
-                btnSouth.classList.add('text-white');
-                btnNorth.classList.remove('text-white');
-                btnNorth.classList.add('text-slate-400');
+                btnSouth.classList.replace('text-slate-400', 'text-white');
+                btnNorth.classList.replace('text-white', 'text-slate-400');
                 starLabel.innerText = "星Aの位置";
-
                 diurnalText.innerHTML = '地球が自転するため、星は1時間に<span class="font-bold text-red-500">15°</span>ずつ<span class="font-bold">東から西へ</span>動きます。';
                 annualText.innerHTML = '地球が公転するため、星は1ヶ月に<span class="font-bold text-red-500">30°</span>ずつ<span class="font-bold">東から西へ</span>動きます。';
             }
@@ -642,28 +634,21 @@
             const parent = canvas.parentElement;
             const dpr = window.devicePixelRatio || 1;
             const rect = parent.getBoundingClientRect();
-
             canvas.width = rect.width * dpr;
             canvas.height = rect.height * dpr;
-
             ctx.scale(dpr, dpr);
-
             canvas.style.width = `${rect.width}px`;
             canvas.style.height = `${rect.height}px`;
-
             logicalWidth = rect.width;
             logicalHeight = rect.height;
-
             draw();
         }
 
         function draw() {
             const W = logicalWidth;
             const H = logicalHeight;
-            
             ctx.clearRect(0, 0, W, H);
             drawStaticStars(W, H); 
-
             if (state.direction === 'south') {
                 drawSouthSky(W, H);
             } else {
@@ -675,31 +660,19 @@
             const CX = W / 2;
             const CY = H * 0.8; 
             const R = Math.min(W, H) * 0.65; 
-
             ctx.fillStyle = "#111827"; 
             ctx.fillRect(0, CY, W, H - CY);
-            ctx.beginPath();
-            ctx.moveTo(0, CY);
-            ctx.lineTo(W, CY);
-            ctx.strokeStyle = "#334155";
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
+            ctx.beginPath(); ctx.moveTo(0, CY); ctx.lineTo(W, CY);
+            ctx.strokeStyle = "#334155"; ctx.lineWidth = 2; ctx.stroke();
             drawSouthGrid(CX, CY, R);
-
             ctx.fillStyle = "#94a3b8";
             const fontSize = Math.max(14, Math.min(20, W / 30));
             ctx.font = `bold ${fontSize}px sans-serif`;
             ctx.textAlign = "center";
-            ctx.fillText("南", CX, CY + 40);
-            ctx.fillText("東", CX - R, CY + 40);
-            ctx.fillText("西", CX + R, CY + 40);
-
+            ctx.fillText("南", CX, CY + 40); ctx.fillText("東", CX - R, CY + 40); ctx.fillText("西", CX + R, CY + 40);
             const angleDeg = calculateCurrentAngle();
-            
             if (state.mode === 'combined') {
                 drawSouthStar(CX, CY, R, 0, 2, "1月10日0時");
-
                 if (state.currentMonthOffset !== 0) {
                     const monthDiff = state.currentMonthOffset;
                     const baseAngle = monthDiff * 30;
@@ -709,14 +682,10 @@
             } else if (state.mode === 'diurnal' || state.mode === 'annual') {
                 drawSouthStar(CX, CY, R, 0, 2, "1月10日0時");
             }
-
             const m = getMonthFromOffset(state.currentMonthOffset);
-            let d = 10;
-            if (state.currentHourOffset < 0) d = 9;
-            let displayH = 0 + state.currentHourOffset;
-            if (displayH < 0) displayH += 24;
+            let d = 10; if (state.currentHourOffset < 0) d = 9;
+            let displayH = 0 + state.currentHourOffset; if (displayH < 0) displayH += 24;
             const currentLabel = `${m}月${d}日${displayH}時`;
-
             drawSouthStar(CX, CY, R, angleDeg, 0, "", currentLabel);
             updateInfoText(angleDeg);
         }
@@ -724,35 +693,21 @@
         function drawSouthGrid(cx, cy, r) {
             ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
             ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
-            ctx.font = "12px sans-serif";
-            ctx.textAlign = "center";
-            ctx.lineWidth = 1;
-
-            ctx.beginPath();
-            ctx.arc(cx, cy, r, Math.PI, 0); 
-            ctx.stroke();
-
+            ctx.font = "12px sans-serif"; ctx.textAlign = "center"; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, 0); ctx.stroke();
             for(let i = -6; i <= 6; i++) {
                 const angleDeg = i * 15;
                 const radCalc = angleDeg * Math.PI / 180;
                 const x = cx + r * Math.sin(radCalc);
                 const y = cy - r * Math.cos(radCalc);
-
-                ctx.beginPath();
-                ctx.moveTo(cx, cy);
-                ctx.lineTo(x, y);
-                ctx.setLineDash([2, 4]);
-                ctx.stroke();
-                ctx.setLineDash([]);
-
+                ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y);
+                ctx.setLineDash([2, 4]); ctx.stroke(); ctx.setLineDash([]);
                 if (Math.abs(angleDeg) <= 90) {
                     const labelR = r + 15;
                     const lx = cx + labelR * Math.sin(radCalc);
                     const ly = cy - labelR * Math.cos(radCalc);
-                    
                     let labelText = Math.abs(angleDeg) + "°";
                     if (Math.abs(angleDeg) === 0) labelText = "0°"; 
-
                     ctx.fillText(labelText, lx, ly + 4);
                 }
             }
@@ -762,256 +717,132 @@
              const rad = angleDeg * Math.PI / 180;
              const sx = cx + r * Math.sin(rad);
              const sy = cy - r * Math.cos(rad);
-
              if (sy <= cy) { 
                 if (type !== 0) { 
-                    ctx.beginPath();
-                    ctx.arc(sx, sy, 8, 0, Math.PI * 2);
-                    
-                    if (type === 2) { 
-                        ctx.fillStyle = "rgba(244, 114, 182, 0.8)";
-                    } else { 
-                        ctx.fillStyle = "rgba(74, 222, 128, 0.8)";
-                    }
+                    ctx.beginPath(); ctx.arc(sx, sy, 8, 0, Math.PI * 2);
+                    ctx.fillStyle = (type === 2) ? "rgba(244, 114, 182, 0.8)" : "rgba(74, 222, 128, 0.8)";
                     ctx.fill();
-                    
                     ctx.fillStyle = (type === 2) ? "rgba(244, 114, 182, 1)" : "rgba(74, 222, 128, 1)";
-                    ctx.font = "10px sans-serif";
-                    ctx.textAlign = "center"; 
-                    ctx.textBaseline = "bottom"; 
+                    ctx.font = "10px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "bottom";
                     ctx.fillText(label, sx, sy - 15);
                 } else { 
-                    ctx.beginPath();
-                    ctx.moveTo(cx, cy);
-                    ctx.lineTo(sx, sy);
-                    ctx.strokeStyle = "rgba(250, 204, 21, 0.5)";
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-
-                    ctx.shadowBlur = 15;
-                    ctx.shadowColor = "yellow";
-                    ctx.beginPath();
-                    ctx.arc(sx, sy, 12, 0, Math.PI * 2);
-                    ctx.fillStyle = "#fbbf24";
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                    
-                    ctx.fillStyle = "white";
-                    ctx.font = "bold 14px sans-serif";
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "bottom";
+                    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(sx, sy);
+                    ctx.strokeStyle = "rgba(250, 204, 21, 0.5)"; ctx.lineWidth = 2; ctx.stroke();
+                    ctx.shadowBlur = 15; ctx.shadowColor = "yellow";
+                    ctx.beginPath(); ctx.arc(sx, sy, 12, 0, Math.PI * 2);
+                    ctx.fillStyle = "#fbbf24"; ctx.fill(); ctx.shadowBlur = 0;
+                    ctx.fillStyle = "white"; ctx.font = "bold 14px sans-serif";
+                    ctx.textAlign = "center"; ctx.textBaseline = "bottom";
                     ctx.fillText("星A", sx, sy - 20);
-                    
                     if (mainLabel) {
-                        ctx.fillStyle = "#fbbf24"; 
-                        ctx.font = "11px sans-serif";
-                        ctx.textAlign = "center";
-                        ctx.textBaseline = "bottom";
+                        ctx.fillStyle = "#fbbf24"; ctx.font = "11px sans-serif";
                         ctx.fillText(mainLabel, sx, sy - 35);
                     }
                 }
-             } else {
-                 if(type === 0) { 
-                    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-                    ctx.font = "italic 14px sans-serif";
-                    ctx.textAlign = "center";
-                    ctx.fillText("地平線の下", sx, cy + 20);
-                 }
+             } else if (type === 0) {
+                 ctx.fillStyle = "rgba(255, 255, 255, 0.5)"; ctx.font = "italic 14px sans-serif";
+                 ctx.textAlign = "center"; ctx.fillText("地平線の下", sx, cy + 20);
              }
         }
 
         function drawNorthSky(W, H) {
-            const CX = W / 2;
-            const CY = H * 0.5;
-            const R = Math.min(W, H) * 0.3; 
-
+            const CX = W / 2; const CY = H * 0.5; const R = Math.min(W, H) * 0.3; 
             const HorizonY = H * 0.95; 
-            
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = "white";
-            ctx.beginPath();
-            ctx.arc(CX, CY, 4, 0, Math.PI * 2);
-            ctx.fillStyle = "#fff";
-            ctx.fill();
-            ctx.shadowBlur = 0;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            
+            ctx.shadowBlur = 10; ctx.shadowColor = "white";
+            ctx.beginPath(); ctx.arc(CX, CY, 4, 0, Math.PI * 2); ctx.fillStyle = "#fff"; ctx.fill();
+            ctx.shadowBlur = 0; ctx.textAlign = "center"; ctx.textBaseline = "middle";
             const fontSizeTitle = Math.max(10, Math.min(14, W / 40));
-            ctx.font = `${fontSizeTitle}px sans-serif`;
-            ctx.fillText("北極星", CX, CY + 20); 
-
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.arc(CX, CY, R, 0, Math.PI * 2);
-            ctx.stroke();
-            
+            ctx.font = `${fontSizeTitle}px sans-serif`; ctx.fillText("北極星", CX, CY + 20); 
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.1)"; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.arc(CX, CY, R, 0, Math.PI * 2); ctx.stroke();
             ctx.fillStyle = "rgba(255, 255, 255, 0.6)"; 
             const fontSizeLabel = Math.max(9, Math.min(12, W / 50));
             ctx.font = `${fontSizeLabel}px sans-serif`;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-
             for(let i=0; i<24; i++) {
-                const deg = i * 15;
-                const rad = (-90 - deg) * Math.PI / 180;
-                
-                const lx = CX + R * Math.cos(rad);
-                const ly = CY + R * Math.sin(rad);
-                
-                ctx.beginPath();
-                ctx.moveTo(CX, CY);
-                ctx.lineTo(lx, ly);
-                ctx.setLineDash([2, 4]);
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-                ctx.stroke();
-                ctx.setLineDash([]);
-                
-                const labelR = R + 25;
-                const tx = CX + labelR * Math.cos(rad);
-                const ty = CY + labelR * Math.sin(rad);
-                
-                let labelNum = deg;
-                if (deg > 180) {
-                    labelNum = 360 - deg;
-                }
-                
-                if (deg % 30 === 0) { 
-                    ctx.fillText(labelNum, tx, ty);
-                } else {
-                    ctx.beginPath();
-                    ctx.arc(tx, ty, 1.5, 0, Math.PI*2);
-                    ctx.fillStyle = "rgba(255,255,255,0.3)";
-                    ctx.fill();
-                    ctx.fillStyle = "rgba(255, 255, 255, 0.6)"; 
+                const deg = i * 15; const rad = (-90 - deg) * Math.PI / 180;
+                const lx = CX + R * Math.cos(rad); const ly = CY + R * Math.sin(rad);
+                ctx.beginPath(); ctx.moveTo(CX, CY); ctx.lineTo(lx, ly);
+                ctx.setLineDash([2, 4]); ctx.strokeStyle = "rgba(255, 255, 255, 0.1)"; ctx.stroke(); ctx.setLineDash([]);
+                const labelR = R + 25; const tx = CX + labelR * Math.cos(rad); const ty = CY + labelR * Math.sin(rad);
+                let labelNum = (deg > 180) ? 360 - deg : deg;
+                if (deg % 30 === 0) ctx.fillText(labelNum, tx, ty);
+                else {
+                    ctx.beginPath(); ctx.arc(tx, ty, 1.5, 0, Math.PI*2);
+                    ctx.fillStyle = "rgba(255,255,255,0.3)"; ctx.fill(); ctx.fillStyle = "rgba(255, 255, 255, 0.6)"; 
                 }
             }
-
-            ctx.fillStyle = "#111827"; 
-            ctx.fillRect(0, HorizonY, W, H - HorizonY);
-            ctx.beginPath();
-            ctx.moveTo(0, HorizonY);
-            ctx.lineTo(W, HorizonY);
-            ctx.strokeStyle = "#334155";
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
+            ctx.fillStyle = "#111827"; ctx.fillRect(0, HorizonY, W, H - HorizonY);
+            ctx.beginPath(); ctx.moveTo(0, HorizonY); ctx.lineTo(W, HorizonY);
+            ctx.strokeStyle = "#334155"; ctx.lineWidth = 2; ctx.stroke();
             ctx.fillStyle = "#94a3b8";
             const fontSizeCompass = Math.max(14, Math.min(20, W / 30));
-            ctx.font = `bold ${fontSizeCompass}px sans-serif`;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "bottom";
-            ctx.fillText("北", CX, HorizonY - 10);
-            ctx.fillText("東", W - 40, HorizonY - 20); 
-            ctx.fillText("西", 40, HorizonY - 20);
-
+            ctx.font = `bold ${fontSizeCompass}px sans-serif`; ctx.textBaseline = "bottom";
+            ctx.fillText("北", CX, HorizonY - 10); ctx.fillText("東", W - 40, HorizonY - 20); ctx.fillText("西", 40, HorizonY - 20);
             const totalShift = calculateCurrentAngle(); 
             const currentRad = (-90 - totalShift) * Math.PI / 180;
-            
-            const sx = CX + R * Math.cos(currentRad);
-            const sy = CY + R * Math.sin(currentRad);
-
+            const sx = CX + R * Math.cos(currentRad); const sy = CY + R * Math.sin(currentRad);
             if (state.mode === 'combined') {
                  const baseRadOrigin = -90 * Math.PI / 180;
-                 const bxOrigin = CX + R * Math.cos(baseRadOrigin);
-                 const byOrigin = CY + R * Math.sin(baseRadOrigin);
+                 const bxOrigin = CX + R * Math.cos(baseRadOrigin); const byOrigin = CY + R * Math.sin(baseRadOrigin);
                  drawNorthStar(bxOrigin, byOrigin, 2, "1月10日0時");
-
                  if (state.currentMonthOffset !== 0) {
                      const baseShift = state.currentMonthOffset * 30;
                      const baseRad = (-90 - baseShift) * Math.PI / 180;
-                     const bx = CX + R * Math.cos(baseRad);
-                     const by = CY + R * Math.sin(baseRad);
+                     const bx = CX + R * Math.cos(baseRad); const by = CY + R * Math.sin(baseRad);
                      const m = getMonthFromOffset(state.currentMonthOffset);
                      drawNorthStar(bx, by, 1, `${m}月10日0時`);
                  }
             } else if (state.mode === 'diurnal' || state.mode === 'annual') {
                  const baseRad = -90 * Math.PI / 180;
-                 const bx = CX + R * Math.cos(baseRad);
-                 const by = CY + R * Math.sin(baseRad);
+                 const bx = CX + R * Math.cos(baseRad); const by = CY + R * Math.sin(baseRad);
                  drawNorthStar(bx, by, 2, "1月10日0時");
             }
-
             const m = getMonthFromOffset(state.currentMonthOffset);
-            let d = 10;
-            if (state.currentHourOffset < 0) d = 9;
-            let displayH = 0 + state.currentHourOffset;
-            if (displayH < 0) displayH += 24;
+            let d = 10; if (state.currentHourOffset < 0) d = 9;
+            let displayH = 0 + state.currentHourOffset; if (displayH < 0) displayH += 24;
             const currentLabel = `${m}月${d}日${displayH}時`;
-
             drawNorthStar(sx, sy, 0, "", currentLabel);
             updateInfoTextNorth(totalShift);
         }
 
         function drawNorthStar(x, y, type, label = "", mainLabel = "") {
-            if (type !== 0) { // Ghost or Origin
-                ctx.beginPath();
-                ctx.arc(x, y, 8, 0, Math.PI * 2);
-                if (type === 2) {
-                    ctx.fillStyle = "rgba(244, 114, 182, 0.8)";
-                } else {
-                    ctx.fillStyle = "rgba(74, 222, 128, 0.8)"; 
-                }
+            if (type !== 0) { 
+                ctx.beginPath(); ctx.arc(x, y, 8, 0, Math.PI * 2);
+                ctx.fillStyle = (type === 2) ? "rgba(244, 114, 182, 0.8)" : "rgba(74, 222, 128, 0.8)";
                 ctx.fill();
-                
-                if (type === 2) ctx.fillStyle = "rgba(244, 114, 182, 1)";
-                else ctx.fillStyle = "rgba(74, 222, 128, 1)";
-                
-                ctx.font = "10px sans-serif";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "bottom";
-                
-                let yOffset = 15; 
-                ctx.fillText(label, x, y - yOffset);
-            } else { // Main
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = "cyan"; 
-                ctx.beginPath();
-                ctx.arc(x, y, 12, 0, Math.PI * 2);
-                ctx.fillStyle = "#22d3ee"; 
-                ctx.fill();
-                ctx.shadowBlur = 0;
-                
-                ctx.fillStyle = "white";
-                ctx.font = "bold 14px sans-serif";
-                ctx.textAlign = "left";
-                ctx.textBaseline = "middle";
+                ctx.fillStyle = (type === 2) ? "rgba(244, 114, 182, 1)" : "rgba(74, 222, 128, 1)";
+                ctx.font = "10px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+                ctx.fillText(label, x, y - 15);
+            } else { 
+                ctx.shadowBlur = 15; ctx.shadowColor = "cyan";
+                ctx.beginPath(); ctx.arc(x, y, 12, 0, Math.PI * 2);
+                ctx.fillStyle = "#22d3ee"; ctx.fill(); ctx.shadowBlur = 0;
+                ctx.fillStyle = "white"; ctx.font = "bold 14px sans-serif";
+                ctx.textAlign = "left"; ctx.textBaseline = "middle";
                 ctx.fillText("星B", x + 16, y);
-
                 if (mainLabel) {
-                    ctx.fillStyle = "#22d3ee"; 
-                    ctx.font = "11px sans-serif";
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "bottom";
+                    ctx.fillStyle = "#22d3ee"; ctx.font = "11px sans-serif";
+                    ctx.textAlign = "center"; ctx.textBaseline = "bottom";
                     ctx.fillText(mainLabel, x, y - 40);
                 }
             }
         }
 
         function calculateCurrentAngle() {
-            const diurnalShift = state.currentHourOffset * 15;
-            const annualShift = state.currentMonthOffset * 30;
-            return diurnalShift + annualShift;
+            return (state.currentHourOffset * 15) + (state.currentMonthOffset * 30);
         }
 
         function drawStaticStars(w, h) {
-            const seed = 123;
             for(let i=0; i<50; i++) {
                 const x = (Math.sin(i * 12.9898) * 43758.5453 % 1) * w; 
                 const y = Math.abs((Math.cos(i * 42.12) * 232.12 % 1) * h * 0.9);
                 ctx.fillStyle = "rgba(255, 255, 255, " + (Math.random() * 0.5 + 0.2) + ")";
-                ctx.beginPath();
-                ctx.arc(x, y, Math.random() * 1.5, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(x, y, Math.random() * 1.5, 0, Math.PI * 2); ctx.fill();
             }
         }
 
         function switchMode(mode) {
-            // Update state
             state.mode = mode;
-            
-            // UI Updates: Tabs
             document.querySelectorAll('.tab-btn').forEach(b => {
                 b.classList.remove('active', 'border-b-4', 'border-blue-600', 'bg-blue-500', 'text-white');
                 b.classList.add('text-slate-600');
@@ -1019,33 +850,22 @@
             const activeBtn = document.getElementById(`tab-${mode}`);
             activeBtn.classList.remove('text-slate-600');
             activeBtn.classList.add('active');
-
-            // UI Updates: Panels
             document.querySelectorAll('.control-panel').forEach(p => p.classList.add('hidden'));
             document.getElementById(`panel-${mode}`).classList.remove('hidden');
-
-            // 問題集タブが押されたらリセット処理
-            if (mode === 'problems') {
-                closeQuestion();
-            }
-
-            // 通常モードへ移動する場合もリセット
-            if(mode !== 'problems') {
-                state.currentMonthOffset = 0;
-                state.currentHourOffset = 0;
+            if (mode === 'problems') closeQuestion();
+            if (mode !== 'problems') {
+                state.currentMonthOffset = 0; state.currentHourOffset = 0;
                 document.getElementById('diurnal-slider').value = 0;
                 document.getElementById('annual-slider').value = 0;
                 document.getElementById('combined-date-slider').value = 0;
                 document.getElementById('combined-time-slider').value = 0;
-                updateDisplay();
-                closeQuestion();
+                updateDisplay(); closeQuestion();
             }
         }
 
         function adjustDiurnal(delta) {
             let newVal = state.currentHourOffset + delta;
-            if(newVal > 6) newVal = 6;
-            if(newVal < -6) newVal = -6;
+            if(newVal > 6) newVal = 6; if(newVal < -6) newVal = -6;
             state.currentHourOffset = newVal;
             document.getElementById('diurnal-slider').value = newVal;
             updateDisplay();
@@ -1053,40 +873,30 @@
 
         function adjustAnnual(delta) {
             let newVal = state.currentMonthOffset + delta;
-            if(newVal > 6) newVal = 6;
-            if(newVal < -6) newVal = -6;
+            if(newVal > 6) newVal = 6; if(newVal < -6) newVal = -6;
             state.currentMonthOffset = newVal;
             document.getElementById('annual-slider').value = newVal;
             updateDisplay();
         }
 
         function resetAll() {
-            state.currentMonthOffset = 0;
-            state.currentHourOffset = 0;
+            state.currentMonthOffset = 0; state.currentHourOffset = 0;
             document.getElementById('diurnal-slider').value = 0;
             document.getElementById('annual-slider').value = 0;
             document.getElementById('combined-date-slider').value = 0;
             document.getElementById('combined-time-slider').value = 0;
-            updateDisplay();
-            closeQuestion();
+            updateDisplay(); closeQuestion();
         }
 
         function updateDisplay() {
-            // 時間の計算
             let hourText = "0:00";
             let rawHour = state.currentHourOffset; 
-            let displayH = 0 + rawHour;
-            if (displayH < 0) displayH += 24;
+            let displayH = 0 + rawHour; if (displayH < 0) displayH += 24;
             hourText = displayH + ":00";
-            
-            // 日付の計算 (時間を戻すと前日になる)
             const m = getMonthFromOffset(state.currentMonthOffset);
-            let d = 10;
-            if (rawHour < 0) d = 9; 
-
+            let d = (rawHour < 0) ? 9 : 10;
             const dateText = `${m}月${d}日`;
             const timeDiffLabel = (rawHour > 0 ? "+" : "") + rawHour + "時間後 (" + hourText + ")";
-
             if (state.mode === 'diurnal') {
                 document.getElementById('diurnal-val').innerText = timeDiffLabel;
                 document.getElementById('displayDate').innerText = "1月" + d + "日";
@@ -1098,26 +908,17 @@
             } else if (state.mode === 'combined') {
                 document.getElementById('combined-date-val').innerText = m + "月10日";
                 document.getElementById('combined-time-val').innerText = hourText;
-                
-                const dateAngle = state.currentMonthOffset * 30;
-                document.getElementById('combined-date-info').innerText = `${dateAngle}°`;
-
-                const timeAngle = rawHour * 15;
-                
+                document.getElementById('combined-date-info').innerText = `${state.currentMonthOffset * 30}°`;
                 let timeInfoText = "";
                 if (state.direction === 'south') {
-                    const dName = rawHour >= 0 ? "西" : "東";
-                    timeInfoText = `${Math.abs(timeAngle)}° (${dName}へ)`;
+                    timeInfoText = `${Math.abs(rawHour * 15)}° (${rawHour >= 0 ? "西" : "東"}へ)`;
                 } else {
-                    const dName = rawHour >= 0 ? "反時計回り" : "時計回り";
-                    timeInfoText = `${Math.abs(timeAngle)}° (${dName})`;
+                    timeInfoText = `${Math.abs(rawHour * 15)}° (${rawHour >= 0 ? "反時計回り" : "時計回り"})`;
                 }
                 document.getElementById('combined-time-info').innerText = timeInfoText;
-                
                 document.getElementById('displayDate').innerText = dateText;
                 document.getElementById('displayTime').innerText = hourText;
-
-                const totalAngle = dateAngle + timeAngle;
+                const totalAngle = (state.currentMonthOffset * 30) + (rawHour * 15);
                 let finalDirText = "";
                 if (state.direction === 'south') {
                      if(totalAngle > 0) finalDirText = `南から西へ ${Math.abs(totalAngle)}°`;
@@ -1125,58 +926,37 @@
                      else finalDirText = "南中";
                      if(Math.abs(totalAngle) > 90) finalDirText = "地平線の下";
                 } else {
-                     let normalized = totalAngle % 360;
-                     if(normalized < 0) normalized += 360;
-                     
-                     if (normalized === 0) {
-                         finalDirText = "北極星の真上 (0°)";
-                     } else if (normalized === 180) {
-                         finalDirText = "北極星の真下 (180°)";
-                     } else if (normalized < 180) {
-                         finalDirText = `反時計回りに ${normalized}°`;
-                     } else {
-                         finalDirText = `時計回りに ${360 - normalized}°`;
-                     }
+                     let normalized = totalAngle % 360; if(normalized < 0) normalized += 360;
+                     if (normalized === 0) finalDirText = "北極星の真上 (0°)";
+                     else if (normalized === 180) finalDirText = "北極星の真下 (180°)";
+                     else if (normalized < 180) finalDirText = `反時計回りに ${normalized}°`;
+                     else finalDirText = `時計回りに ${360 - normalized}°`;
                 }
                 document.getElementById('combined-total-val').innerText = finalDirText;
             }
-
             draw();
         }
 
         function updateInfoText(angle) {
-            let direction = "";
-            let absAngle = Math.abs(angle);
-            
-            if (Math.abs(angle) < 2) direction = "南中 (0°)";
+            let direction = ""; let absAngle = Math.abs(angle);
+            if (absAngle < 2) direction = "南中 (0°)";
             else if (angle < 0) direction = `南から東へ ${absAngle}°`;
             else direction = `南から西へ ${absAngle}°`;
-
             if (absAngle > 90) direction = "地平線の下";
-
             document.getElementById('positionInfo').innerText = direction;
         }
 
         function updateInfoTextNorth(totalShift) {
-            let deg = totalShift % 360;
-            if(deg < 0) deg += 360;
-            
+            let deg = totalShift % 360; if(deg < 0) deg += 360;
             let text = "";
-            if (deg === 0) {
-                text = "北極星の真上 (0°)";
-            } else if (deg === 180) {
-                text = "北極星の真下 (180°)";
-            } else if (deg < 180) {
-                text = `反時計回りに ${deg}°`;
-            } else {
-                text = `時計回りに ${360 - deg}°`;
-            }
-            
+            if (deg === 0) text = "北極星の真上 (0°)";
+            else if (deg === 180) text = "北極星の真下 (180°)";
+            else if (deg < 180) text = `反時計回りに ${deg}°`;
+            else text = `時計回りに ${360 - deg}°`;
             document.getElementById('positionInfo').innerText = text;
         }
 
         window.onload = init;
-
     </script>
 </body>
 </html>
